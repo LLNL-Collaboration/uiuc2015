@@ -22,7 +22,11 @@ try:
 	print("secret is " + secret)
 	s.logout()
 	#connect to the port
-	command = "curl localhost:" + str(port)
+	server = "localhost"
+	tunnel = "ssh -fnNT -L 6000:localhost:" + port + " " + username + "@" + server
+	print(tunnel)
+	os.system(tunnel)
+	command = "curl localhost:6000"
 	os.system(command)	
 except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."
