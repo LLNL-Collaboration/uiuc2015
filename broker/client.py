@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from pexpect import pxssh
 import getpass
 import os
@@ -9,11 +11,16 @@ try:
         username = getpass.getuser()
         s.login (hostname, username)
 	#send command to execute broker to get the connection information	        
-	s.sendline ('/project/shared/broker.py load')
+	s.sendline ('/project/shared/uiuc2015/broker/broker.py load')
         s.prompt()
 	#get the port
-        port = s.before.split("\n")[1].strip()
-        s.logout()
+        job = s.before.split("\n")[1].strip()
+        job = job.split(":")
+	port = job[0]
+	secret = job[1]
+	print("port is " + port)
+	print("secret is " + secret)
+	s.logout()
 	#connect to the port
 	command = "curl localhost:" + str(port)
 	os.system(command)	
