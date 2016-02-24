@@ -15,8 +15,9 @@ elif sys.argv[1] == 'save':
         cxn = sys.argv[2]
         random.seed(cxn)
         secret = random.getrandbits(2048)
+        job = cxn +  ":" + str(secret) 
         fo = open(filename, "w")
-        fo.write(cxn, secret)
+        fo.write(job)
         print secret
 else:
         print( "invalid arg(s). Use 'load' or 'save' [cxn-info]")
