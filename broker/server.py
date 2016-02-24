@@ -25,9 +25,10 @@ try:
     hostname = '52.91.27.217'
     username = getpass.getuser()
     s.login (hostname, username)
-    s.sendline ('/project/shared/broker.py save ' + str(port))  # run a command
+    s.sendline ('/project/shared/uiuc2015/broker/broker.py save ' + str(port))  # run a command
     s.prompt()             # match the prompt
-    print s.before         # print everything before the prompt.
+    secret = s.before
+    print secret         # print everything before the prompt.
     s.logout()
 except pxssh.ExceptionPxssh,e:
     print "pxssh failed on login."
