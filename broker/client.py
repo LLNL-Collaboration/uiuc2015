@@ -4,10 +4,16 @@ from pexpect import pxssh
 import getpass
 import os
 
-try:                                                            
+BROKER_IP = "52.91.27.217"
+
+try:    
+	###
+	# get the secret from the broker
+	###
+                                                        
 	s = pxssh.pxssh()
 	#connect to broker
-        hostname = '52.91.27.217'
+        hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
 	#send command to execute broker to get the connection information	        
@@ -18,15 +24,21 @@ try:
         job = job.split(":")
 	port = job[0]
 	secret = job[1]
-	print("port is " + port)
-	print("secret is " + secret)
+	print("Broker says the port is: " + port)
+	print("Broker says the secret is: " + secret)
 	s.logout()
+
+	###
+	# get job data from server
+	###
+
 	#connect to the port
 	server = "localhost"
-	tunnel = "ssh -fnNT -L 6000:localhost:" + port + " " + username + "@" + server
-	print(tunnel)
+	tunnel = "ssh -fnNT -L 6005:localhost:" + port + " " + username + "@" + server
+	print("Opening a tunnel: \n" + tunnel)
 	os.system(tunnel)
-	command = "curl localhost:6000"
+	command = 'echo "' + secret + '" | nc localhost 6005'
+	print("Connecting to server with the secret: " + command)
 	os.system(command)	
 except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."
