@@ -11,6 +11,23 @@ from random import randint
 
 # see https://docs.python.org/2/library/socketserver.html
 
+BROKER_IP = "52.91.27.217"
+
+def verify(secret):
+    try:
+        s = pxssh.pxssh()
+        hostname = '52.91.27.217' # broker ip
+        username = getpass.getuser()
+        s.login (hostname, username)
+        s.sendline ('/project/shared/uiuc2015/broker/broker.py save ' + str(port))  # run a command
+        s.prompt()             # match the prompt
+        secret_string = s.before.split("\n")[1].strip()
+        print secret_string         # print everything before the prompt.
+        s.logout()
+    except pxssh.ExceptionPxssh,e:
+        print "pxssh failed on login."
+        print str(e)
+
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
     """
@@ -27,7 +44,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print "{} wrote:".format(self.client_address[0])
         print self.data
         ret = ""
-
+        valid = 
         # if bad secret or error, fail gracefully
         if self.data != secret_string:
             print("client gave bad secret")
