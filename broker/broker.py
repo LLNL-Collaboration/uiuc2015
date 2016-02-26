@@ -3,6 +3,7 @@
 import sys
 import os
 import random 
+import binascii
 
 #open the file where connection information is stored (this users home directory)
 filename = os.path.expanduser('~') + "/connections.txt"
@@ -13,8 +14,7 @@ elif sys.argv[1] == 'load':
         print fo.read()
 elif sys.argv[1] == 'save':
         cxn = sys.argv[2]
-        random.seed(cxn)
-        secret = random.getrandbits(2048)
+        secret = binascii.hexlify(os.urandom(512))
         job = cxn +  ":" + str(secret) 
         fo = open(filename, "w")
         fo.write(job)
