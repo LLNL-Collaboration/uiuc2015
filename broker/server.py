@@ -46,15 +46,13 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         print self.data
         valid = verify(self.data) == "True"
         ret = ""
-        valid = 
         # if bad secret or error, fail gracefully
         if valid:
             print("client gave good secret")
             ret = "\n Correct Secret: \n Job Data: \n job data\n"
             self.request.sendall(ret)
-
         # if good secret, return job data
-       else:
+        else:
             print("client gave bad secret")
             ret = "\n Authorization Error: \n Bad Secret\n"
             self.request.sendall(ret)
