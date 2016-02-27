@@ -33,24 +33,23 @@ def query(host = BROKER_IP):
 def load(job_id, host = BROKER_IP):
 	command = '/project/shared/uiuc2015/broker/broker.py load ' + job_id
 	ret = run(command, host)[0]
-	print(ret)
+	#print(ret)
 	job = json.loads(ret)
 	job_id = job["job_id"]
 	port = str(job["port"])
 	secret = job["secret"]
-	print("Broker says the job_id is: " + job_id)
-	print("Broker says the port is: " + port)
-	print("Broker says the secret is: " + secret)
-	print str(job)
+	#print("Broker says the job_id is: " + job_id)
+	#print("Broker says the port is: " + port)
+	#print("Broker says the secret is: " + secret)
 	return (job_id, port, secret)
 
 def fetch_job(job_id, host = "localhost"):
 	job_id, port, secret = load(job_id, BROKER_IP)
 	tunnel = "ssh -fnNT -L 6005:" + host + ":" + port + " " + username + "@" + host
-	print("Opening a tunnel: \n" + tunnel)
+	#print("Opening a tunnel: \n" + tunnel)
 	os.system(tunnel)
 	command = 'echo "' + secret + '" | nc localhost 6005'
-	print("Connecting to server with the secret: " + command)
+	#print("Connecting to server with the secret: " + command)
 	os.system(command)	
 
 def print_usage():
