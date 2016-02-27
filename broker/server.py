@@ -7,6 +7,7 @@ import getpass
 import SocketServer
 import time
 from random import randint
+import json
 
 
 # see https://docs.python.org/2/library/socketserver.html
@@ -19,7 +20,8 @@ def verify(secret):
         hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py verify ' + secret)  # run a command
+        job_id = "job_" + str(port)
+        s.sendline ('/project/shared/uiuc2015/broker/broker.py verify ' + job_id + ' ' + secret )  # run a command
         s.prompt()             # match the prompt
         valid = s.before.split("\n")[1].strip()
         s.logout()
@@ -64,9 +66,7 @@ if __name__ == "__main__":
 
     # generate random port for the service to run on
     host = "localhost"
-    port = randint(8000, 10000)
-    print("**************")
-    print(port)
+
 
     #get secret to broker
     try:
@@ -74,10 +74,11 @@ if __name__ == "__main__":
         hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py save ' + str(port))  # run a command
+        s.sendline ('/project/shared/uiuc2015/broker/broker.py save ')  # run a command
         s.prompt()             # match the prompt
-        secret_string = s.before.split("\n")[1].strip()
-        print secret_string         # print everything before the prompt.
+        port = s.before.split("\n")[1].strip()
+        port = int(port)
+        print port         # print everything before the prompt.
         s.logout()
     except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."
