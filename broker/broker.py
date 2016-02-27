@@ -5,6 +5,7 @@ import os
 import random 
 import binascii
 import json
+import getpass
 
 def is_json(myjson):
         try:
@@ -14,7 +15,6 @@ def is_json(myjson):
         return True
 
 def get_jobs():
-        filename = os.path.expanduser('~') + "/connections.txt"
         fo = open(filename, "r")
         jobs = fo.read().split("\n")
         parsed_jobs = []
@@ -58,8 +58,10 @@ def get_fresh_port():
                 new_port = random.randint(8000, 10000)
         return new_port
 
-#open the file where connection information is stored (this users home directory)
-filename = os.path.expanduser('~') + "/connections.txt"
+
+username = getpass.getuser()
+filename = os.path.abspath('/project/shared/home/' + username + "/connections.txt")
+
 if len(sys.argv) == 1:
         print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [cxn-info]'")
 elif sys.argv[1] == 'load':
