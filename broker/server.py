@@ -16,17 +16,18 @@ BROKER_IP = "52.91.27.217"
 def verify(secret):
     try:
         s = pxssh.pxssh()
-        hostname = '52.91.27.217' # broker ip
+        hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py save ' + str(port))  # run a command
+        s.sendline ('/project/shared/uiuc2015/broker/broker.py verify ' + secret)  # run a command
         s.prompt()             # match the prompt
-        secret_string = s.before.split("\n")[1].strip()
-        print secret_string         # print everything before the prompt.
+        valid = s.before.split("\n")[1].strip()
         s.logout()
+        return valid
     except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."
         print str(e)
+        return false
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
@@ -43,21 +44,23 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         self.data = self.request.recv(1024).strip()
         print "{} wrote:".format(self.client_address[0])
         print self.data
+        valid = verify(self.data) == "True"
         ret = ""
         valid = 
         # if bad secret or error, fail gracefully
-        if self.data != secret_string:
-            print("client gave bad secret")
-            ret = "\n Authorization Error: \n Bad Secret\n"
-            self.request.sendall(ret)
-
-        # if good secret, return job data
-        elif self.data == secret_string:
+        if valid:
             print("client gave good secret")
             ret = "\n Correct Secret: \n Job Data: \n job data\n"
             self.request.sendall(ret)
 
-        # just send back the same data, but upper-cased
+        # if good secret, return job data
+       else:
+            print("client gave bad secret")
+            ret = "\n Authorization Error: \n Bad Secret\n"
+            self.request.sendall(ret)
+
+
+
 
 if __name__ == "__main__":
 
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     #get secret to broker
     try:
         s = pxssh.pxssh()
-        hostname = '52.91.27.217' # broker ip
+        hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
         s.sendline ('/project/shared/uiuc2015/broker/broker.py save ' + str(port))  # run a command
