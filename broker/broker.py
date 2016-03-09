@@ -52,7 +52,7 @@ def save_job():
 
 	#TODO generate cert
 	if ctype == 'ssl':
-		command = os.getcwd()+"/certgen.sh " + filepath + "/" + job_id
+		command = "/project/shared/uiuc2015/broker/certgen.sh " + filepath + "/" + job_id
 		os.system(command)
                 key = filepath+"/" + job_id + ".pem"
                 return(port, key)
