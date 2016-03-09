@@ -86,6 +86,7 @@ if __name__ == "__main__":
 	 
         s.prompt()             # match the prompt
         info = s.before.split("\n")[1].strip()
+	print info
         info = json.loads(info)
         print info         # print everything before the prompt.
 	port = info[0]
