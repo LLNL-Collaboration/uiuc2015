@@ -37,14 +37,18 @@ def load(job_id, host = BROKER_IP):
 	job = json.loads(ret)
 	job_id = job["job_id"]
 	port = str(job["port"])
-	secret = job["secret"]
+	secret = job.get("secret")
+	ssl = job.get('ctype')
 	#print("Broker says the job_id is: " + job_id)
 	#print("Broker says the port is: " + port)
 	#print("Broker says the secret is: " + secret)
-	return (job_id, port, secret)
+	return (job_id, port, secret, ssl)
 
 def fetch_job(job_id, host = "localhost"):
-	job_id, port, secret = load(job_id, BROKER_IP)
+	job_id, port, secret, ssl = load(job_id, BROKER_IP)
+	if ssl == 'ssl':
+		print("Connect via web browser to:" + host +" on port: " + port)
+		return
 	tunnel = "ssh -fnNT -L 6005:" + host + ":" + port + " " + username + "@" + host
 	#print("Opening a tunnel: \n" + tunnel)
 	os.system(tunnel)

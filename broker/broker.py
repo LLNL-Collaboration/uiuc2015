@@ -15,6 +15,8 @@ def is_json(myjson):
         return True
 
 def get_jobs():
+	if not os.path.isfile(filename):
+		return []
         fo = open(filename, "r")
         jobs = fo.read().split("\n")
         parsed_jobs = []
@@ -37,6 +39,7 @@ def append_job(job):
 def save_job():
         port = get_fresh_port()
         jobs = get_jobs()
+	ctype = sys.argv[2]
         # TODO
         # check if job is already in jobs
         # if it is, update the job, and rewrite file
@@ -44,9 +47,17 @@ def save_job():
         # else just append new job
         secret = binascii.hexlify(os.urandom(512))
         job_id = "job_" + str(port)
-        job = {"job_id": job_id, "port": port, "secret": secret}
+        job = {"job_id": job_id, "port": port, "secret": secret, "ctype": ctype}
         append_job(job)
-        return port
+
+	#TODO generate cert
+	if ctype == 'ssl':
+		command = "./certgen.sh " + filepath + "/" + job_id
+		os.system(command)
+                key = filepath+"/" + job_id + ".pem"
+                return(port, key)
+        	#return port,command
+        return (port, "")
 
 def get_fresh_port():
         jobs = get_jobs()
@@ -60,21 +71,24 @@ def get_fresh_port():
 
 
 username = getpass.getuser()
-filename = os.path.abspath('/project/shared/home/' + username + "/connections.txt")
+filepath = os.path.abspath('/project/shared/home/' + username)
+filename = os.path.abspath(filepath + "/connections.txt")
 
 if len(sys.argv) == 1:
-        print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [cxn-info]'")
+        print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save (ssh/ssl)'")
 elif sys.argv[1] == 'load':
         job_id = sys.argv[2].strip()
         jobs = get_jobs()
         for job in jobs:
-                if job["job_id"] == job_id:
+                if job.get("job_id") == job_id:
                         print(json.dumps(job))
 
 elif sys.argv[1] == 'query':
         jobs = get_jobs()
+        job_ids = []
         for job in jobs:
-                print job["job_id"]
+                job_ids.append(job["job_id"])
+        print(json.dumps(job_ids))
 
 elif sys.argv[1] == 'verify':
         job_id = sys.argv[2].strip()
@@ -88,8 +102,14 @@ elif sys.argv[1] == 'verify':
         print valid
 
 elif sys.argv[1] == 'save':
-        port = save_job()
-        print(port)
+	if len(sys.argv) is not 3:
+		print("usage: save (ssh/ssl)")
+	else:
+		if sys.argv[2].lower() not in ['ssl', 'ssh']:
+			print("usage: save (ssh/ssl)")
+		else:
+        		ret = save_job()
+        		print(json.dumps(ret))
 else:
-        print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [cxn-info]'")
+        print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [ssh/ssl]'")
 

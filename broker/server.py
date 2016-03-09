@@ -2,7 +2,7 @@
 
 from pexpect import pxssh
 import getpass
-
+import sys
 # server.py
 import SocketServer
 import time
@@ -66,7 +66,15 @@ if __name__ == "__main__":
 
     # generate random port for the service to run on
     host = "localhost"
-
+    if len(sys.argv)!=2:
+	print("Usage: server.py ssl/ssh")
+	exit
+    else:    	
+	if sys.argv[1] in ['ssl','ssh']:
+		ssl= sys.argv[1]
+	else:
+		print("Usage: server.py ssl/ssh") 
+		exit
 
     #get secret to broker
     try:
@@ -74,19 +82,23 @@ if __name__ == "__main__":
         hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py save ')  # run a command
+        s.sendline ('/project/shared/uiuc2015/broker/broker.py save '+ ssl)  # run a command
+	 
         s.prompt()             # match the prompt
-        port = s.before.split("\n")[1].strip()
-        port = int(port)
-        print port         # print everything before the prompt.
+        info = s.before.split("\n")[1].strip()
+        info = json.loads(info)
+        print info         # print everything before the prompt.
+	port = info[0]
         s.logout()
     except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."
         print str(e)
+    if ssl=="ssh":
+    	# Create the server, binding to localhost on selected port
+    	server = SocketServer.TCPServer((host, port), MyTCPHandler)
 
-    # Create the server, binding to localhost on selected port
-    server = SocketServer.TCPServer((host, port), MyTCPHandler)
-
-    # Activate the server; this will keep running until you
-    # interrupt the program with Ctrl-C
-    server.serve_forever()
+    	# Activate the server; this will keep running until you
+   	 # interrupt the program with Ctrl-C
+    	server.serve_forever()
+    else:
+	print info[1]
