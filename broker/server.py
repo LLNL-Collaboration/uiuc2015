@@ -13,7 +13,7 @@ import json
 
 # see https://docs.python.org/2/library/socketserver.html
 
-#BROKER_IP = "52.91.27.217"
+# BROKER_IP = "52.91.27.217"
 BROKER_IP = "localhost"
 CONDUIT_PATH = "/project/shared/conduit/build-debug/tests/conduit_io/t_conduit_io_websocket"
 BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py "

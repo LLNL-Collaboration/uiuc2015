@@ -6,6 +6,7 @@ if [[ ! $# == 1 ]]; then
 fi
 
 FILEN=$1
+#PASS_FILE defines the password used in key generation. This probably should be obtained/created differently
 PASS_FILE="/project/shared/uiuc2015/broker/pass/pass.txt"
 {
 openssl genrsa -des3 -passout file:${PASS_FILE} -out ${FILEN}.key 1024 
