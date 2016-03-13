@@ -90,10 +90,11 @@ if __name__ == "__main__":
 	 
         s.prompt()             # match the prompt
         info = s.before.split("\n")[1].strip()
-	print info
+
+        print info
         info = json.loads(info)
         print info         # print everything before the prompt.
-	port = info[0]
+        port = info[0]
         s.logout()
     except pxssh.ExceptionPxssh,e:
         print "pxssh failed on login."

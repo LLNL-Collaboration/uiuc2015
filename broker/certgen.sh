@@ -6,7 +6,7 @@ if [[ ! $# == 1 ]]; then
 fi
 
 FILEN=$1
-PASS_FILE="pass/pass.txt"
+PASS_FILE="/project/shared/uiuc2015/broker/pass/pass.txt"
 {
 openssl genrsa -des3 -passout file:${PASS_FILE} -out ${FILEN}.key 1024 
 openssl req -new -key ${FILEN}.key -passin file:${PASS_FILE} -out ${FILEN}.csr -subj '/O=Conduit'
