@@ -7,6 +7,12 @@ import binascii
 import json
 import getpass
 
+#These may need to be changed based on users directory
+username = getpass.getuser()
+filepath = os.path.abspath('/project/shared/home/' + username)
+filename = os.path.abspath(filepath + "/connections.txt")
+certgen_path = "/project/shared/uiuc2015/broker/certgen.sh"
+
 def is_json(myjson):
         try:
                 json_object = json.loads(myjson)
@@ -52,7 +58,7 @@ def save_job():
 
 	#TODO generate cert
 	if ctype == 'ssl':
-		command = "/project/shared/uiuc2015/broker/certgen.sh " + filepath + "/" + job_id
+		command = certgen_path + " " + filepath + "/" + job_id
 		os.system(command)
                 key = filepath+"/" + job_id + ".pem"
                 return(port, key)
@@ -70,10 +76,6 @@ def get_fresh_port():
         return new_port
 
 
-username = getpass.getuser()
-filepath = os.path.abspath('/project/shared/home/' + username)
-filename = os.path.abspath(filepath + "/connections.txt")
-
 if len(sys.argv) == 1:
         print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save (ssh/ssl)'")
 elif sys.argv[1] == 'load':
@@ -82,6 +84,7 @@ elif sys.argv[1] == 'load':
         for job in jobs:
                 if job.get("job_id") == job_id:
                         print(json.dumps(job))
+			exit()
 
 elif sys.argv[1] == 'query':
         jobs = get_jobs()
@@ -104,6 +107,7 @@ elif sys.argv[1] == 'verify':
 elif sys.argv[1] == 'save':
 	if len(sys.argv) is not 3:
 		print("usage: save (ssh/ssl)")
+	
 	else:
 		if sys.argv[2].lower() not in ['ssl', 'ssh']:
 			print("usage: save (ssh/ssl)")

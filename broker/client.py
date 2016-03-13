@@ -7,8 +7,10 @@ import sys
 import json
 
 
-BROKER_IP = "52.91.27.217"
+#BROKER_IP = "52.91.27.217"
+BROKER_IP = "localhost"
 CONDUIT_IP = "localhost"
+BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
 
 def run(command, host):
 	try:
@@ -26,13 +28,18 @@ def run(command, host):
 	        print str(e)
 
 def query(host = BROKER_IP):
-	command = '/project/shared/uiuc2015/broker/broker.py query'
+	command = BROKER_PATH + ' query'
 	ret = run(command, host)
 	return ret
 
 def load(job_id, host = BROKER_IP):
-	command = '/project/shared/uiuc2015/broker/broker.py load ' + job_id
-	ret = run(command, host)[0]
+	command = BROKER_PATH +' load ' + job_id
+	ret= run(command, host)
+	if len(ret)==0:
+		print("Job not found")
+		exit()
+	else:
+		ret= ret[0]
 	#print(ret)
 	job = json.loads(ret)
 	job_id = job["job_id"]
@@ -47,7 +54,7 @@ def load(job_id, host = BROKER_IP):
 def fetch_job(job_id, host = "localhost"):
 	job_id, port, secret, ssl = load(job_id, BROKER_IP)
 	if ssl == 'ssl':
-		print("Connect via web browser to:" + host +" on port: " + port)
+		print("Connect via web browser to: '" + host +"' on port: '" + port + "'")
 		return
 	tunnel = "ssh -fnNT -L 6005:" + host + ":" + port + " " + username + "@" + host
 	#print("Opening a tunnel: \n" + tunnel)

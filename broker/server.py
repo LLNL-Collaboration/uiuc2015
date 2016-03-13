@@ -13,8 +13,11 @@ import json
 
 # see https://docs.python.org/2/library/socketserver.html
 
-BROKER_IP = "52.91.27.217"
+#BROKER_IP = "52.91.27.217"
+BROKER_IP = "localhost"
 CONDUIT_PATH = "/project/shared/conduit/build-debug/tests/conduit_io/t_conduit_io_websocket"
+BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py "
+
 def verify(secret):
     try:
         s = pxssh.pxssh()
@@ -22,7 +25,7 @@ def verify(secret):
         username = getpass.getuser()
         s.login (hostname, username)
         job_id = "job_" + str(port)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py verify ' + job_id + ' ' + secret )  # run a command
+        s.sendline (BROKER_PATH + ' verify ' + job_id + ' ' + secret )  # run a command
         s.prompt()             # match the prompt
         valid = s.before.split("\n")[1].strip()
         s.logout()
@@ -75,7 +78,7 @@ if __name__ == "__main__":
 		ssl= sys.argv[1]
 	else:
 		print("Usage: server.py ssl/ssh") 
-		exit
+		exit()
 
     #get secret to broker
     try:
@@ -83,7 +86,7 @@ if __name__ == "__main__":
         hostname = BROKER_IP
         username = getpass.getuser()
         s.login (hostname, username)
-        s.sendline ('/project/shared/uiuc2015/broker/broker.py save '+ ssl)  # run a command
+        s.sendline (BROKER_PATH + ' save '+ ssl)  # run a command
 	 
         s.prompt()             # match the prompt
         info = s.before.split("\n")[1].strip()
@@ -104,7 +107,7 @@ if __name__ == "__main__":
     	server.serve_forever()
     else:
         port = info[0]
-        path = info[1]
+        path = str(info[1])
         print(path)
         print(port)
         print("\n")
