@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from subprocess import call
 from pexpect import pxssh
 import getpass
 import sys
@@ -13,7 +14,7 @@ import json
 # see https://docs.python.org/2/library/socketserver.html
 
 BROKER_IP = "52.91.27.217"
-
+CONDUIT_PATH = "/project/shared/conduit/build-debug/tests/conduit_io/t_conduit_io_websocket"
 def verify(secret):
     try:
         s = pxssh.pxssh()
@@ -102,4 +103,12 @@ if __name__ == "__main__":
    	 # interrupt the program with Ctrl-C
     	server.serve_forever()
     else:
+        port = info[0]
+        path = info[1]
+        print(path)
+        print(port)
+        print("\n")
+        call([CONDUIT_PATH, "launch", "ssl", str(port), path])
+
+	print "path:" + info[1]
 	print info[1]
