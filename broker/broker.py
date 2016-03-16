@@ -21,8 +21,8 @@ def is_json(myjson):
         return True
 
 def get_jobs():
-	if not os.path.isfile(filename):
-		return []
+        if not os.path.isfile(filename):
+                return []
         fo = open(filename, "r")
         jobs = fo.read().split("\n")
         parsed_jobs = []
@@ -42,10 +42,9 @@ def append_job(job):
                 fo.write(json.dumps(job))
                 fo.write("\n")
 
-def save_job():
+def save_job(ctype):
         port = get_fresh_port()
         jobs = get_jobs()
-	ctype = sys.argv[2]
         # TODO
         # check if job is already in jobs
         # if it is, update the job, and rewrite file
@@ -55,15 +54,13 @@ def save_job():
         job_id = "job_" + str(port)
         job = {"job_id": job_id, "port": port, "secret": secret, "ctype": ctype}
         append_job(job)
-
-	#TODO generate cert
-	if ctype == 'ssl':
-		command = certgen_path + " " + filepath + "/" + job_id
-		os.system(command)
+        key = ""
+        if ctype == 'ssl':
+                command = certgen_path + " " + filepath + "/" + job_id
+                os.system(command)
                 key = filepath+"/" + job_id + ".pem"
-                return(port, key)
-        	#return port,command
-        return (port, "")
+         
+        return { "port" : port , "cpath" : key }
 
 def get_fresh_port():
         jobs = get_jobs()
@@ -84,14 +81,15 @@ elif sys.argv[1] == 'load':
         for job in jobs:
                 if job.get("job_id") == job_id:
                         print(json.dumps(job))
-			exit()
+                        exit()
 
 elif sys.argv[1] == 'query':
         jobs = get_jobs()
         job_ids = []
         for job in jobs:
-                job_ids.append(job["job_id"])
-        print(json.dumps(job_ids))
+                job_ids.append((job["job_id"], job["port"]))
+#        print job_ids
+        print(json.dumps(jobs))
 
 elif sys.argv[1] == 'verify':
         job_id = sys.argv[2].strip()
@@ -105,15 +103,16 @@ elif sys.argv[1] == 'verify':
         print valid
 
 elif sys.argv[1] == 'save':
-	if len(sys.argv) is not 3:
-		print("usage: save (ssh/ssl)")
-	
-	else:
-		if sys.argv[2].lower() not in ['ssl', 'ssh']:
-			print("usage: save (ssh/ssl)")
-		else:
-        		ret = save_job()
-        		print(json.dumps(ret))
+        if len(sys.argv) is not 3:
+                print("usage: save (ssh/ssl)")
+        
+        else:
+                if sys.argv[2].lower() not in ['ssl', 'ssh']:
+                        print("usage: save (ssh/ssl)")
+                else:
+                        ctype = sys.argv[2]
+                        ret = save_job(ctype)
+                        print(json.dumps(ret))
 else:
         print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [ssh/ssl]'")
 
