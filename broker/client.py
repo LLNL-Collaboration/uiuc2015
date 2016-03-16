@@ -8,8 +8,8 @@ import json
 
 
 #BROKER_IP = "52.91.27.217"
-BROKER_IP = "localhost"
-CONDUIT_IP = "localhost"
+BROKER_IP = "conduit"
+CONDUIT_IP = "conduit"
 BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
 
 def run(command, host):
@@ -29,7 +29,7 @@ def run(command, host):
 
 def query(host = BROKER_IP):
 	command = BROKER_PATH + ' query'
-	ret = run(command, host)
+	ret = run(command, host)[0]
 	return ret
 
 def load(job_id, host = BROKER_IP):
