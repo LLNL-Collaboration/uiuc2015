@@ -114,7 +114,7 @@ if __name__ == "__main__":
         print("Usage: server.py ssl/ssh") 
         exit()
 
-    #get secret to broker
+    #get secret from broker
     try:
         s = pxssh.pxssh()
         hostname = BROKER_IP
