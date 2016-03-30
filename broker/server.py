@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from subprocess import call
+from subprocess import Popen
 from pexpect import pxssh
 import getpass
 import sys
@@ -12,6 +13,13 @@ import json
 import urllib
 import signal
 
+import os
+import atexit
+from time import sleep
+from helpers import run
+
+
+
 # see https://docs.python.org/2/library/socketserver.html
 
 # BROKER_IP = "52.91.27.217"
@@ -22,42 +30,40 @@ BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
 LORENZ_PATH = "http://lorenz/lorenz/lora/lora.cgi/user/ME/conduit/save"
 
 
-def sighandler():
-    print ("oops")
-    exit()
+def kill_child():
+    if child_pid is None:
+        pass
+    else:
+        os.kill(child_pid, signal.SIGTERM)
 
 def verify(secret):
-    try:
-        s = pxssh.pxssh()
-        hostname = BROKER_IP
-        username = getpass.getuser()
-        s.login (hostname, username)
-        job_id = "job_" + str(port)
-        s.sendline (BROKER_PATH + ' verify ' + job_id + ' ' + secret )  # run a command
-        s.prompt()             # match the prompt
-        valid = s.before.split("\n")[1].strip()
-        s.logout()
-        return valid
-    except pxssh.ExceptionPxssh,e:
-        print ("pxssh failed on login.")
-        print (str(e))
-        return false
-
+    host = BROKER_IP
+    command = BROKER_PATH + ' verify ' + job_id + ' ' + secret
+    res = run(command, host)
+    return res
 
 def lorenz():
     url = LORENZ_PATH
     response = urllib.urlopen(url)
     data = json.loads(response.read())
     job = data["output"]
-    print (job)
     job = json.loads(job)
 
     cpath = job["cpath"]
     port = job["port"]
-    print(cpath)
-    print(port)
-    print("\n")
-    call([CONDUIT_PATH, "launch", "ssl", str(port), cpath])
+    proc = Popen([CONDUIT_PATH, "launch", "ssl", str(port), cpath])
+
+    # Here you can get the PID
+    child_pid = proc.pid
+    # Now we can wait for the child to complete
+    (output, error) = proc.communicate()
+    #proc.wait()
+    if error:
+        print "error:", error
+
+    print "output:", output
+
+
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
@@ -90,17 +96,13 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
 
 if __name__ == "__main__":
+    # don't leave orphan application running
+    child_pid = None
+    atexit.register(kill_child)
 
-    for i in [x for x in dir(signal) if x.startswith("SIG")]:
-        try:
-            signum = getattr(signal,i)
-            signal.signal(signum,sighandler)
-        except RuntimeError,m:
-            print "Skipping %s"%i
-        except ValueError,e:
-            print ""
 
     # generate random port for the service to run on
+    
     host = "localhost"
     if len(sys.argv)!=2:
         print("Usage: server.py ssl/ssh")
@@ -114,7 +116,7 @@ if __name__ == "__main__":
         print("Usage: server.py ssl/ssh") 
         exit()
 
-    #get secret to broker
+    #get secret from broker
     try:
         s = pxssh.pxssh()
         hostname = BROKER_IP
