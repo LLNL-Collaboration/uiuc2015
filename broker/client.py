@@ -9,7 +9,6 @@ from config import *
 
 from helpers import run
 
-
 def query(host = BROKER_IP):
 	command = BROKER_PATH + ' query'
 	ret = run(command, host)[0]
