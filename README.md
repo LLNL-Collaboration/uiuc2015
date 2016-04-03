@@ -1,11 +1,21 @@
 # uiuc2015
 Documentation for "Broker"
 
+
+
 =====================
 General Workflow
 =====================
 (features/algorithms/commands/implementation/security features)
 <Image of workflow here>
+
+
+=====================
+Getting Started
+=====================
+1. Modify config.py
+2. Modify path in certgen.py
+
 __________________________________________________________________
 
 ------------------------------------------------------------------------------
@@ -127,3 +137,5 @@ Runs broker.py with ssh/ssl with save parameter.
 Server starts application on the port provided by the broker
 In ssh case: the client connects via ssh tunnel to the server and provides a secret which the server then verifies with the broker
 In the ssl case: the server starts up the web application (currently conduit) with the cert path provided by the broker
+
+

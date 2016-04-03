@@ -42,7 +42,7 @@ def lorenz():
 
     cpath = job["cpath"]
     port = job["port"]
-    proc = Popen([CONDUIT_PATH, "launch", "ssl", str(port), cpath])
+    proc = Popen([SERVER_PATH, "launch", "ssl", str(port), cpath])
 
     # Here you can get the PID
     child_pid = proc.pid
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         print(path)
         print(port)
         print("\n")
-        call([CONDUIT_PATH, "launch", "ssl", str(port), path])
+        call([SERVER_PATH, "launch", "ssl", str(port), path])
         print ("path:" + info[1])
         print (info[1])
 

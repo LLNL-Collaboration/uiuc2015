@@ -57,7 +57,7 @@ if __name__ == "__main__":
 		print jobs
 	elif sys.argv[1] == 'load':
 		if len(sys.argv) > 2:
-			fetch_job(sys.argv[2], CONDUIT_IP)
+			fetch_job(sys.argv[2], SERVER_IP)
 		else:
 			print_usage()
 	else:
