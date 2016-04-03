@@ -34,11 +34,17 @@ def verify(secret):
 
 def lorenz():
     url = LORENZ_PATH
-    response = urllib.urlopen(url)
-    print(response)
-    data = json.loads(response.read())
-    job = data["output"]
-    job = json.loads(job)
+    if LOCAL:
+        print("local")
+        cmd = BROKER_PATH + " save ssl"
+        data = run(cmd, BROKER_IP)
+        job = json.loads(data[0])
+    else:
+        response = urllib.urlopen(url)
+        print(response)
+        data = json.loads(response.read())
+        job = data["output"]
+        job = json.loads(job)
 
     cpath = job["cpath"]
     port = job["port"]

@@ -56,8 +56,8 @@ def save_job(ctype):
         return { "port" : port , "cpath" : key }
 
 def get_fresh_port():
-        if debug:
-                return debug_port
+        if DEBUG:
+                return DEBUG_PORT
         jobs = get_jobs()
         current_ports = set()
         for job in jobs:
