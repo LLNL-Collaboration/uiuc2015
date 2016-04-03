@@ -81,7 +81,6 @@ elif sys.argv[1] == 'load':
 
 elif sys.argv[1] == 'query':
         jobs = get_jobs()
-        print("here")
         job_ids = []
         for job in jobs:
                 job_ids.append((job["job_id"], job["port"]))
