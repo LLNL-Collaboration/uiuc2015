@@ -4,10 +4,18 @@ import getpass
 import os
 import sys
 import json
+from config import *
+
+import subprocess
+
 
 
 
 def run(command, host):
+	if LOCAL:
+		output = subprocess.check_output(command, shell=True)
+		return [output]
+
 	try:
 		s = pxssh.pxssh()
 		hostname = host

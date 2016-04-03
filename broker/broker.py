@@ -69,6 +69,7 @@ def get_fresh_port():
 
 
 if len(sys.argv) == 1:
+        print sys.argv
         print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save (ssh/ssl)'")
 elif sys.argv[1] == 'load':
         job_id = sys.argv[2].strip()
@@ -80,6 +81,7 @@ elif sys.argv[1] == 'load':
 
 elif sys.argv[1] == 'query':
         jobs = get_jobs()
+        print("here")
         job_ids = []
         for job in jobs:
                 job_ids.append((job["job_id"], job["port"]))
