@@ -6,19 +6,12 @@ import random
 import binascii
 import json
 import getpass
+from config import *
+from helpers import is_json
 
-#These may need to be changed based on users directory
 username = getpass.getuser()
-filepath = os.path.abspath('/project/shared/home/' + username)
+filepath = os.path.abspath(user_dir_base + username)
 filename = os.path.abspath(filepath + "/connections.txt")
-certgen_path = "/project/shared/uiuc2015/broker/certgen.sh"
-
-def is_json(myjson):
-        try:
-                json_object = json.loads(myjson)
-        except ValueError, e:
-                return False
-        return True
 
 def get_jobs():
         if not os.path.isfile(filename):
@@ -59,10 +52,12 @@ def save_job(ctype):
                 command = certgen_path + " " + filepath + "/" + job_id
                 os.system(command)
                 key = filepath+"/" + job_id + ".pem"
-         
+        
         return { "port" : port , "cpath" : key }
 
 def get_fresh_port():
+        if debug:
+                return debug_port
         jobs = get_jobs()
         current_ports = set()
         for job in jobs:

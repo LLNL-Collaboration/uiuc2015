@@ -5,27 +5,9 @@ import getpass
 import os
 import sys
 import json
+from config import *
 
-
-#BROKER_IP = "52.91.27.217"
-BROKER_IP = "conduit"
-CONDUIT_IP = "conduit"
-BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
-
-def run(command, host):
-	try:
-		s = pxssh.pxssh()
-		hostname = host
-		username = getpass.getuser()
-		s.login (hostname, username)
-		s.sendline (command)
-		s.prompt()
-		output = s.before.split("\r\n")[1:-1]
-		s.logout()
-		return output
-	except pxssh.ExceptionPxssh,e:
-	        print "pxssh failed on login."
-	        print str(e)
+from helpers import run
 
 def query(host = BROKER_IP):
 	command = BROKER_PATH + ' query'
@@ -75,7 +57,7 @@ if __name__ == "__main__":
 		print jobs
 	elif sys.argv[1] == 'load':
 		if len(sys.argv) > 2:
-			fetch_job(sys.argv[2], CONDUIT_IP)
+			fetch_job(sys.argv[2], SERVER_IP)
 		else:
 			print_usage()
 	else:
