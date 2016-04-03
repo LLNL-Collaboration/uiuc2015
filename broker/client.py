@@ -5,13 +5,9 @@ import getpass
 import os
 import sys
 import json
+from config import *
 
 from helpers import run
-
-#BROKER_IP = "52.91.27.217"
-BROKER_IP = "conduit"
-CONDUIT_IP = "conduit"
-BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
 
 def query(host = BROKER_IP):
 	command = BROKER_PATH + ' query'

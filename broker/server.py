@@ -12,22 +12,12 @@ from random import randint
 import json
 import urllib
 import signal
+from config import *
 
 import os
 import atexit
 from time import sleep
 from helpers import run
-
-
-
-# see https://docs.python.org/2/library/socketserver.html
-
-# BROKER_IP = "52.91.27.217"
-BROKER_IP = "localhost"
-CONDUIT_IP = "conduit"
-CONDUIT_PATH = "/project/shared/conduit/build-debug/tests/conduit_io/t_conduit_io_websocket"
-BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
-LORENZ_PATH = "http://lorenz/lorenz/lora/lora.cgi/user/ME/conduit/save"
 
 
 def kill_child():
@@ -45,6 +35,7 @@ def verify(secret):
 def lorenz():
     url = LORENZ_PATH
     response = urllib.urlopen(url)
+    print(response)
     data = json.loads(response.read())
     job = data["output"]
     job = json.loads(job)
