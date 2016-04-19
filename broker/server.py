@@ -48,11 +48,11 @@ def lorenz():
 
     cpath = job["cpath"]
     port = job["port"]
-    proc = Popen([SERVER_PATH, "launch", "ssl", str(port), cpath])
-
-    # Here you can get the PID
+    print(cpath, port)
+    print([SERVER_PATH, "launch", "ssl"])
+    proc = Popen([SERVER_PATH, "launch", "ssl"])
+    print SERVER_PATH
     child_pid = proc.pid
-    # Now we can wait for the child to complete
     (output, error) = proc.communicate()
     #proc.wait()
     if error:
