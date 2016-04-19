@@ -11,5 +11,6 @@ DEBUG_PORT = 8000
 LOCAL = True
 
 #Broker Configuration:
-user_dir_base = "/project/shared/home/"
-certgen_path = "/project/shared/uiuc2015/broker/certgen.sh"
+USER_DIR_BASE = "/project/shared/home/"
+CERTGEN_PATH = "/project/shared/uiuc2015/broker/certgen.sh"
+
