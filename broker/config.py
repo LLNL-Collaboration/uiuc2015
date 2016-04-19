@@ -1,7 +1,7 @@
 #General Configuration
 
-BROKER_IP = "conduit"
-SERVER_IP = "conduit"
+BROKER_IP = "lorenz"
+SERVER_IP = "lorenz"
 BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
 SERVER_PATH = "/project/shared/conduit/build-debug/tests/conduit_io/t_conduit_io_websocket"
 BROKER_PATH = "/project/shared/uiuc2015/broker/broker.py"
