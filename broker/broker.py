@@ -10,7 +10,7 @@ from config import *
 from helpers import is_json
 
 username = getpass.getuser()
-filepath = os.path.abspath(user_dir_base + username)
+filepath = os.path.abspath(USER_DIR_BASE + username)
 filename = os.path.abspath(filepath + "/connections.txt")
 
 def get_jobs():
@@ -49,7 +49,7 @@ def save_job(ctype):
         append_job(job)
         key = ""
         if ctype == 'ssl':
-                command = certgen_path + " " + filepath + "/" + job_id
+                command = CERTGEN_PATH + " " + filepath + "/" + job_id
                 os.system(command)
                 key = filepath+"/" + job_id + ".pem"
         
