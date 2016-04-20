@@ -5,9 +5,20 @@ import getpass
 import os
 import sys
 import json
-from config import *
+import shlex
+import subprocess
+from ConfigParser import SafeConfigParser
 
 from helpers import run
+
+config = SafeConfigParser()
+dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
+config_file_path = os.path.join(dir, 'config.ini')
+config.read(config_file_path)
+
+BROKER_PATH = config.get('general', 'BROKER_PATH')
+BROKER_IP = config.get('general', 'BROKER_IP')
+SERVER_IP = config.get('general', 'SERVER_IP')
 
 def query(host = BROKER_IP):
 	command = BROKER_PATH + ' query'
@@ -40,10 +51,12 @@ def fetch_job(job_id, host = "localhost"):
 		return
 	tunnel = "ssh -fnNT -L 6005:" + host + ":" + port + " " + username + "@" + host
 	#print("Opening a tunnel: \n" + tunnel)
-	os.system(tunnel)
+	tunnel = shlex.split(tunnel)
+	subprocess.Popen(tunnel)
 	command = 'echo "' + secret + '" | nc localhost 6005'
 	#print("Connecting to server with the secret: " + command)
-	os.system(command)	
+	command = shlex.split(command)
+	subprocess.Popen(command)	
 
 def print_usage():
 	print( "invalid arg(s). Use 'query' or 'load [job_id]'")

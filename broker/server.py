@@ -12,13 +12,22 @@ from random import randint
 import json
 import urllib
 import signal
-from config import *
+from ConfigParser import SafeConfigParser
 
 import os
 import atexit
 from time import sleep
 from helpers import run
 
+config = SafeConfigParser()
+dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
+config_file_path = os.path.join(dir, 'config.ini')
+config.read(config_file_path)
+BROKER_IP = config.get('general','BROKER_IP')
+BROKER_PATH = config.get('general','BROKER_PATH')
+SERVER_PATH = config.get('general', 'SERVER_PATH')
+LOCAL = config.getboolean('general', 'LOCAL')
+LORENZ_PATH = config.get('general', 'LORENZ_PATH')
 
 def kill_child():
     if child_pid is None:
@@ -88,8 +97,8 @@ if __name__ == "__main__":
         username = getpass.getuser()
         s.login (hostname, username)
         s.sendline (BROKER_PATH + ' save '+ ssl)  # run a command
-
         s.prompt()             # match the prompt
+	print s.before
         info = s.before.split("\n")[1].strip()
 
         print (info)

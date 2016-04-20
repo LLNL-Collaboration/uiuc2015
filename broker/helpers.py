@@ -4,12 +4,15 @@ import getpass
 import os
 import sys
 import json
-from config import *
+from ConfigParser import SafeConfigParser
 
 import subprocess
 
-
-
+config = SafeConfigParser()
+dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
+config_file_path = os.path.join(dir, 'config.ini')
+config.read(config_file_path)
+LOCAL = config.getboolean('general', 'LOCAL')
 
 def run(command, host):
 	if LOCAL:
