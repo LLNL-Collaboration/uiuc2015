@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import sys
 import os
-import random 
+import random
 import binascii
 import json
 import getpass
 from config import *
 from helpers import is_json
+import optparse
 
 username = getpass.getuser()
 filepath = os.path.abspath(USER_DIR_BASE + username)
@@ -52,7 +52,7 @@ def save_job(ctype):
                 command = CERTGEN_PATH + " " + filepath + "/" + job_id
                 os.system(command)
                 key = filepath+"/" + job_id + ".pem"
-        
+
         return { "port" : port , "cpath" : key }
 
 def get_fresh_port():
@@ -67,48 +67,43 @@ def get_fresh_port():
                 new_port = random.randint(8000, 10000)
         return new_port
 
+parser = optparse.OptionParser()
+parser.add_option('-l', '--load', dest='load', help='job_id to get information about')
+parser.add_option('-q', '--query', action='store_true', dest='query', help='returns job list in json')
+parser.add_option('-v', '--verify', nargs=2, dest='verify', help='verify the secret with a secret matching the job_id in connections.txt')
+parser.add_option('-s', '--save', dest='save', help='called when the server needs to register a job')
+options, args = parser.parse_args()
 
-if len(sys.argv) == 1:
-        print sys.argv
-        print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save (ssh/ssl)'")
-elif sys.argv[1] == 'load':
-        job_id = sys.argv[2].strip()
-        jobs = get_jobs()
-        for job in jobs:
-                if job.get("job_id") == job_id:
-                        print(json.dumps(job))
-                        exit()
+if options.load:
+    jobs = get_jobs()
+    for job in jobs:
+        if job.get("job_id") == options.load:
+            print(json.dumps(job))
 
-elif sys.argv[1] == 'query':
-        jobs = get_jobs()
-        job_ids = []
-        for job in jobs:
-                job_ids.append((job["job_id"], job["port"]))
-#        print job_ids
-        print(json.dumps(jobs))
+elif options.query:
+    jobs = get_jobs()
+    job_ids = []
+    for job in jobs:
+        job_ids.append((job["job_id"], job["port"]))
+    print(json.dumps(jobs))
 
-elif sys.argv[1] == 'verify':
-        job_id = sys.argv[2].strip()
-        secret = sys.argv[3].strip()
-        valid = False
-        jobs = get_jobs()
-        for job in jobs:
-                if job["job_id"] == job_id:
-                        if job["secret"] == secret:
-                                valid = True
-        print valid
+elif options.verify:
+    job_id = options.verify[0]
+    secret = options.verify[1]
+    valid = False
+    jobs = get_jobs()
+    for job in jobs:
+        if job['job_id'] == job_id:
+            if job['secret'] == secret:
+                valid = True
+    print valid
 
-elif sys.argv[1] == 'save':
-        if len(sys.argv) is not 3:
-                print("usage: save (ssh/ssl)")
-        
-        else:
-                if sys.argv[2].lower() not in ['ssl', 'ssh']:
-                        print("usage: save (ssh/ssl)")
-                else:
-                        ctype = sys.argv[2]
-                        ret = save_job(ctype)
-                        print(json.dumps(ret))
+elif options.save:
+    if options.save.lower() not in ['ssl', 'ssh']:
+        print("usage: save (ssh/ssl)")
+    else:
+        ret = save_job(options.save)
+        print(json.dumps(ret))
+
 else:
         print( "invalid arg(s). Use 'load [job-id]', 'query', or 'save [ssh/ssl]'")
-
