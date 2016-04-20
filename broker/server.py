@@ -1,22 +1,23 @@
 #! /usr/bin/env python
 
-from subprocess import call
-from subprocess import Popen
-from pexpect import pxssh
 import getpass
-import sys
-# server.py
+import os
+import atexit
 import SocketServer
-import time
-from random import randint
 import json
 import urllib
 import signal
 from ConfigParser import SafeConfigParser
-
 import os
 import atexit
+import optparse
+import time
 from time import sleep
+from random import randint
+from subprocess import call
+from subprocess import Popen
+from pexpect import pxssh
+from config import *
 from helpers import run
 
 config = SafeConfigParser()
@@ -37,28 +38,28 @@ def kill_child():
 
 def verify(secret):
     host = BROKER_IP
-    command = BROKER_PATH + ' verify ' + job_id + ' ' + secret
+    command = BROKER_PATH + ' --verify ' + job_id + ' ' + secret
     res = run(command, host)
     return res
 
 def lorenz():
     url = LORENZ_PATH
     if LOCAL:
-        print("local")
-        cmd = BROKER_PATH + " save ssl"
+        print "local"
+        cmd = BROKER_PATH + " --save ssl"
         data = run(cmd, BROKER_IP)
         job = json.loads(data[0])
     else:
         response = urllib.urlopen(url)
-        print(response)
+        print response
         data = json.loads(response.read())
         job = data["output"]
         job = json.loads(job)
 
     cpath = job["cpath"]
     port = job["port"]
-    print(cpath, port)
-    print([SERVER_PATH, "launch", "ssl"])
+    print cpath, port
+    print [SERVER_PATH, "launch", "ssl"]
     proc = Popen([SERVER_PATH, "launch", "ssl"])
     print SERVER_PATH
     child_pid = proc.pid
@@ -74,20 +75,25 @@ if __name__ == "__main__":
     child_pid = None
     atexit.register(kill_child)
 
-
     # generate random port for the service to run on
-    
+
     host = "localhost"
-    if len(sys.argv)!=2:
-        print("Usage: server.py ssl/ssh")
-        exit()
-    if sys.argv[1] in ['ssl','ssh']:
-        ssl = sys.argv[1]
-    elif "lorenz" in sys.argv:
+    parser = optparse.OptionParser()
+    parser.add_option('-s', '--save', dest='save',
+                      help='run broker with save parameter')
+    parser.add_option('-l', '--lorenz', action='store_true', dest='lorenz')
+    options, args = parser.parse_args()
+
+    if options.save:
+        if options.save in ['ssl', 'ssh']:
+            ssl = options.save
+
+    elif options.lorenz:
         lorenz()
         exit()
+
     else:
-        print("Usage: server.py ssl/ssh") 
+        print "Usage: server.py ssl/ssh"
         exit()
 
     #get secret from broker
@@ -95,22 +101,22 @@ if __name__ == "__main__":
         s = pxssh.pxssh()
         hostname = BROKER_IP
         username = getpass.getuser()
-        s.login (hostname, username)
-        s.sendline (BROKER_PATH + ' save '+ ssl)  # run a command
+        s.login(hostname, username)
+        s.sendline(BROKER_PATH + '--save '+ ssl)  # run a command
         s.prompt()             # match the prompt
 	print s.before
         info = s.before.split("\n")[1].strip()
 
-        print (info)
+        print info
         info = json.loads(info)
-        print (info)         # print everything before the prompt.
+        print info         # print everything before the prompt.
         port = info[0]
         s.logout()
-    except pxssh.ExceptionPxssh,e:
+    except pxssh.ExceptionPxssh, e:
         print "pxssh failed on login."
         print str(e)
 
-    if ssl=="ssh":
+    if ssl == "ssh":
         # Create the server, binding to localhost on selected port
         server = SocketServer.TCPServer((host, port), MyTCPHandler)
 
@@ -120,12 +126,9 @@ if __name__ == "__main__":
     else:
         port = info[0]
         path = str(info[1])
-        print(path)
-        print(port)
-        print("\n")
+        print path
+        print port
+        print "\n"
         call([SERVER_PATH, "launch", "ssl", str(port), path])
-        print ("path:" + info[1])
-        print (info[1])
-
-
-
+        print "path:" + info[1]
+        print info[1]
