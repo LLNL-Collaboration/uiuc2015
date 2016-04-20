@@ -109,4 +109,4 @@ elif options.save:
         print json.dumps(ret)
 
 else:
-    print"invalid arg(s). Use 'load [job-id]', 'query', or 'save [ssh/ssl]'"
+    print "invalid arg(s). Use 'load [job-id]', 'query', or 'save [ssh/ssl]'"
