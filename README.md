@@ -62,7 +62,7 @@ Using Broker to help establish a trusted HTTPS connection between a client and s
 ------------------------------------------------------------------------------------------
 server --> broker: register service and request port by running “broker.py --save ssl”
 
-broker: generate port, create ssl cert (future: register ssl cert with trusted ca). Save job data in user directory.
+broker: generate port, create ssl cert *(future: register ssl cert with trusted ca)*. Save job data in user directory.
 
 broker --> server: return port, ssl cert path
 
@@ -83,8 +83,8 @@ Supported Functionalty:
 
 * **(save)** Request: register service by type of connection
     * SSH Case:
-	* Action: establish ssh tunneling for port, generate magic key
-	* Reply: port
+        * Action: establish ssh tunneling for port, generate magic key
+        * Reply: port
 
     * HTTPS Case:
         * Action: generate port, generate magic key, create ssl cert, (future: register ssl cert with trusted ca)
@@ -118,10 +118,10 @@ In ssh case, returns a port and a 4096 bit randomly generated secret (from /dev/
 In ssl case, returns a port and generates a certificate and returns its path
 
 #####-l, --load *job_id*
-Returns a job information about given job\_id
+Returns a job information about given "job\_id"
 
 #####-v, --verify *job_id* *secret*
-Verifies the “secret” with a secret matching the job\_id in connections.txt 
+Verifies the “secret” with a secret matching the "job\_id" in connections.txt 
 
 Client.py
 ----------
