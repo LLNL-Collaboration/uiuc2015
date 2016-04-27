@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# This file should contain a password to use when generating the cert.
 PASS_FILE="/project/shared/home/${USER}/pass.txt"
 
 if [[ ! $# == 1 ]]; then

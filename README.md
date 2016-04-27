@@ -6,14 +6,14 @@ General Workflow
 =====================
 <!--(features/algorithms/commands/implementation/security features)-->
 <!--Image of workflow here-->
-A user wants to start running an application on a machine.
-The user starts the application through the broker's server script.
-The broker stores its knowledge of the application and generates a port and other relevant data for verified (user specific) communication.
+A user wants to start running an application on a machine.  
+The user starts the application through the broker's server script.  
+The broker stores its knowledge of the application and generates a port and other relevant data for verified (user specific) communication.  
 
-The user now wants to access the running application.
-The user runs the broker's client script by way of terminal or other means such as a lorenz portlet.
-The broker returns the port and other relevant data for verified communication.
-The user uses this data to connect to the application.
+The user now wants to access the running application.  
+The user runs the broker's client script by way of terminal or other means such as a lorenz portlet.  
+The broker returns the port and other relevant data for verified communication.  
+The user uses this data to connect to the application.  
 
 
 Getting Started
