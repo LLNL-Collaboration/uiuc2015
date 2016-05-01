@@ -5,12 +5,11 @@ import os
 import json
 import shlex
 import subprocess
-from ConfigParser import SafeConfigParser
+import ConfigParser
 import optparse
-from config import *
 from helpers import run, is_json
 
-config = SafeConfigParser()
+config = ConfigParser.SafeConfigParser()
 dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(dir, 'config.ini')
 config.read(config_file_path)

@@ -1,79 +1,101 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import getpass
 import os
 import atexit
-import SocketServer
 import json
 import urllib
 import signal
-from ConfigParser import SafeConfigParser
+import configparser
 import os
 import atexit
 import optparse
 import time
+import getpass
+import crypt
+import hashlib
+import importlib.util
+
+from binascii import hexlify
 from time import sleep
 from random import randint
 from subprocess import call
 from subprocess import Popen
 from pexpect import pxssh
-from config import *
-from helpers import run
+from helpers import *
 
-config = SafeConfigParser()
+config = configparser.SafeConfigParser()
 dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(dir, 'config.ini')
 config.read(config_file_path)
 BROKER_IP = config.get('general','BROKER_IP')
 BROKER_PATH = config.get('general','BROKER_PATH')
-SERVER_PATH = config.get('general', 'SERVER_PATH')
 LOCAL = config.getboolean('general', 'LOCAL')
 LORENZ_PATH = config.get('general', 'LORENZ_PATH')
+USER_DIR_BASE = config.get('broker','USER_DIR_BASE')
+USERNAME = getpass.getuser()
+FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME)
 
-def kill_child():
-    if child_pid is None:
-        pass
+# def kill_child():
+#     if child_pid is None:
+#         os.kill(child_pid, signal.SIGKILL)
+#         print("here")
+#         pass
+#     else:
+#         print("not here")
+#         os.kill(child_pid, signal.SIGKILL)
+#         os.kill(child_pid, signal.SIGKILL)
+
+
+
+def get_password_hash(app_module):
+    return app_module.get_password()
+
+def prep_run_command(app_module, job):
+    cmd_str = app_module.get_launch_cmd(job)
+    return cmd_str.split(" ")
+
+def run_app(app):
+    app_module = get_app_config(app)
+    require_password = config.get(app,'REQUIRE_PASSWORD') == "True"
+    print(require_password)
+    if(require_password):
+        password_hash = get_password_hash(app_module)
+        pass_param = " -p " + password_hash
     else:
-        os.kill(child_pid, signal.SIGTERM)
-
-def verify(secret):
-    host = BROKER_IP
-    command = BROKER_PATH + ' --verify ' + job_id + ' ' + secret
-    res = run(command, host)
-    return res
-
-def lorenz():
+        pass_param = ""
     url = LORENZ_PATH
     if LOCAL:
-        print "local"
-        cmd = BROKER_PATH + " --save ssl"
+        print("local")
+        cmd = BROKER_PATH + " -s -a " + app + pass_param
         data = run(cmd, BROKER_IP)
+        print(data)
         job = json.loads(data[0])
     else:
         response = urllib.urlopen(url)
-        print response
+        print(response)
         data = json.loads(response.read())
         job = data["output"]
         job = json.loads(job)
 
-    cpath = job["cpath"]
-    port = job["port"]
-    print cpath, port
-    print [SERVER_PATH, "launch", "ssl"]
-    proc = Popen([SERVER_PATH, "launch", "ssl"])
-    print SERVER_PATH
+    print(job)
+    cmd = prep_run_command(app_module, job)
+    print(cmd)
+    proc = Popen(cmd)
     child_pid = proc.pid
+    print(child_pid)
     (output, error) = proc.communicate()
+    ### tell broker the child pid ###
     #proc.wait()
     if error:
-        print "error:", error
+        print("error:", error)
+    print("output:", output)
 
-    print "output:", output
+
 
 if __name__ == "__main__":
     # don't leave orphan application running
     child_pid = None
-    atexit.register(kill_child)
 
     # generate random port for the service to run on
 
@@ -81,54 +103,24 @@ if __name__ == "__main__":
     parser = optparse.OptionParser()
     parser.add_option('-s', '--save', dest='save',
                       help='run broker with save parameter')
-    parser.add_option('-l', '--lorenz', action='store_true', dest='lorenz')
+    parser.add_option('-a', '--app', dest='app',
+                  help='Determines which application to run. Use either conduit or juypter')
     options, args = parser.parse_args()
 
-    if options.save:
-        if options.save in ['ssl', 'ssh']:
-            ssl = options.save
+    # if options.save:
+    #     if options.save in ['ssl', 'ssh']:
+    #         ssl = options.save
 
-    elif options.lorenz:
-        lorenz()
-        exit()
+    print(options, args)
+    if options.app:
+        app = options.app.lower()
+        print(app)
+
+        if app not in ['conduit', 'jupyter']:
+            print("please use conduit or jupyter for app")
+            exit()
+        run_app(app);
 
     else:
-        print "Usage: server.py ssl/ssh"
+        print("Usage: server.py ssl/ssh app must be jupyter or conduit")
         exit()
-
-    #get secret from broker
-    try:
-        s = pxssh.pxssh()
-        hostname = BROKER_IP
-        username = getpass.getuser()
-        s.login(hostname, username)
-        s.sendline(BROKER_PATH + '--save '+ ssl)  # run a command
-        s.prompt()             # match the prompt
-	print s.before
-        info = s.before.split("\n")[1].strip()
-
-        print info
-        info = json.loads(info)
-        print info         # print everything before the prompt.
-        port = info[0]
-        s.logout()
-    except pxssh.ExceptionPxssh, e:
-        print "pxssh failed on login."
-        print str(e)
-
-    if ssl == "ssh":
-        # Create the server, binding to localhost on selected port
-        server = SocketServer.TCPServer((host, port), MyTCPHandler)
-
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        server.serve_forever()
-    else:
-        port = info[0]
-        path = str(info[1])
-        print path
-        print port
-        print "\n"
-        call([SERVER_PATH, "launch", "ssl", str(port), path])
-        print "path:" + info[1]
-        print info[1]
