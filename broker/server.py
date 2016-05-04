@@ -2,26 +2,14 @@
 
 import getpass
 import os
-import atexit
 import json
-import urllib
-import signal
 import configparser
 import os
-import atexit
 import optparse
-import time
-import getpass
 import crypt
 import hashlib
 import importlib.util
-
-from binascii import hexlify
-from time import sleep
-from random import randint
-from subprocess import call
 from subprocess import Popen
-from pexpect import pxssh
 from helpers import *
 
 config = configparser.SafeConfigParser()

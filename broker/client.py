@@ -3,7 +3,6 @@
 import getpass
 import os
 import json
-import shlex
 import subprocess
 import configparser
 import optparse

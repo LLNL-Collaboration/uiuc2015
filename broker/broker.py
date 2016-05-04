@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 
 import os
-import random
-import binascii
 import json
 import getpass
 import optparse
-import shlex
-import subprocess
 import configparser
 from helpers import *
 import importlib.util
-import socket
 import time
 
 #get path of configuration file
