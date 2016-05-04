@@ -89,6 +89,7 @@ Each of the above fields are required, but additional ones can be added
 
 #####[app\_modules/{app\_name}\_module.py]
 You must implement at least the following functions:
+
 	get_launch_cmd(job):
 		Takes the job to run as input. Must return a string of the command that will launch the application.
 	gen_config(job):

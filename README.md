@@ -28,7 +28,7 @@ Your broker and server should have the following, and each script should be acce
 
 Your client computer should have the following.
 
-	-uiuc2015
+	- uiuc2015
 		- client.py
 		- helpers.py
 		- config.ini
