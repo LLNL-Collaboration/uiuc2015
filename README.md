@@ -1,146 +1,38 @@
-# Documentation for "Broker"
-The broker's goal is to enable a connection between two computers that is restricted to a particular user.
-<!--More info?-->
+#Quick Start Guide:
 
-General Workflow
-=====================
-<!--(features/algorithms/commands/implementation/security features)-->
-<!--Image of workflow here-->
-A user wants to start running an application on a machine.  
-The user starts the application through the broker's server script.  
-The broker stores its knowledge of the application and generates a port and other relevant data for verified (user specific) communication.  
+###[Overview]:
+This application helps facilitate easily and securely launching applications and keeping track of currently running applications. There are three main components to this project: server.py, broker.py, and client.py. Information about each running application is stored in the JSON job object. The server launches the application. The broker stores information about each of the running jobs. The client requests how to access each job from the broker.
 
-The user now wants to access the running application.  
-The user runs the broker's client script by way of terminal or other means such as a lorenz portlet.  
-The broker returns the port and other relevant data for verified communication.  
-The user uses this data to connect to the application.  
+####[Requirements]
+All of the scripts require python 3.
 
+####[Setting up]
+Clone the repo:
+`git clone https://github.com/LLNL-Collaboration/uiuc2015.git`
 
-Getting Started
-=====================
-1. Modify config.ini
-2. Modify path in certgen.py
+Using your favorite text editor open config.ini and replace all of the values for the general fields. 
+- Set the broker and server IP; they can be on the same or separate machines. 
+- Set the broker path to be path to the broker.py file on the broker host.
+- Set DEBUG to true and DEBUG\_PORT to any port number to force the broker to only use one port.
+- Set APPLICATION\_OPTIONS to be a list of the names of your currently supported applications.
+- Set the USER\_DIR\_BASE to be where each user directory is found on the broker host, e.g. /home/
 
----
+Your broker and server should have the following, and each script should be accessible to any logged in user.
+-uiuc2015
+   -broker.py
+   -server.py
+   -helpers.py
+   -config.ini
 
-Using Broker to help establish an SSH tunnel to a general TCP/IP socket server.
-------------------------------------------------------------------------------
-**Note: may not be fully functional**
-
-client: ssh to host
-
-client(via ssh): start server on host by running “server.py -s ssh”
-
-server --> broker: register service and request port (by running “broker.py --save ssh”)
-
-broker: generate port, generate magic key, save information locally in user directory
-
-broker --> server: return port
-
-server: open socket server on port
-
----server is running---
-
-client: run “client.py load *job_id*”
-
-client(via ssh) --> broker : request port #, magic key
-
-client: establish ssh tunnel to server port
-
-client: open connection via tunnel to server
-
-client(via tunnel) --> server: provide magic key
-
-server --> broker: verify magic key
-
-if verify fails: close socket connection to client
-if verify passes: start general communication over socket.
+Your client computer should have the following.
+-uiuc2015
+   - client.py
+   - helpers.py
+   - config.ini
 
 
+####[Launching an already supported application]
+You can find the list of supported applications in APPLICATION\_OPTIONS of the config.ini file.
 
-Using Broker to help establish a trusted HTTPS connection between a client and server
-------------------------------------------------------------------------------------------
-server --> broker: register service and request port by running “broker.py --save ssl”
+If you would like to run one of the already supported applications, then simply launching "./server.py -s -a {name\_of\_app}" will be enough to launch the application. Information about the job will be stored by the broker. If you are using the front end portlet designed for use with Open Lorenz, then your list of currently running jobs will appear in the portlet, and you can connect to them from there. Otherwise running "./client.py query" will fetch from the broker how to connect to any of your currently running jobs.
 
-broker: generate port, create ssl cert *(future: register ssl cert with trusted ca)*. Save job data in user directory.
-
-broker --> server: return port, ssl cert path
-
-server: open https server on port using ssl cert
-
-client(via ssh, or something like lorenz) --> broker : request port # by running “client.py load *job_id*”
-
-client: creates ssh tunnel to server running service *(future: automagically)*
-
-client: connects to the tunneled service using web browser
-
-*(future: secret for verification OR two way auth with certs)*
-
-
-Broker Functionality
--------------------------
-Supported Functionalty:
-
-* **(save)** Request: register service by type of connection
-    * SSH Case:
-        * Action: establish ssh tunneling for port, generate magic key
-        * Reply: port
-
-    * HTTPS Case:
-        * Action: generate port, generate magic key, create ssl cert, (future: register ssl cert with trusted ca)
-        * Reply: port, path to ssl cert
-
-
-* **(load)** Request: give info about an active service by job\_id
-    * Action: look up and give info about active service
-    * Reply: port, magic key, job\_type
-
-
-* **(verify)** Request: verify magic key
-    * Action: check magic key against existing key on broker
-    * Reply: boolean if job\_id and secret are matched
-
-
-* **(query)** Request: list all existing jobs
-    * Action: query active registrations by name
-    * Reply: list of registered jobs
-
-
-Broker.py 
-----------
-
-#####-q, --query
-Read in connections.txt (in the user’s directory) containing the user’s jobs, returns job list in json
-
-#####-s, --save *ssh|ssl*
-Called when the server needs to register a job. 
-In ssh case, returns a port and a 4096 bit randomly generated secret (from /dev/urandom). 
-In ssl case, returns a port and generates a certificate and returns its path
-
-#####-l, --load *job_id*
-Returns a job information about given "job\_id"
-
-#####-v, --verify *job_id* *secret*
-Verifies the “secret” with a secret matching the "job\_id" in connections.txt 
-
-Client.py
-----------
-
-#####-q, --query
-Opens up ssh shell, runs the broker script with “query” which returns all the active job names
-
-#####-l, --load *job_id*
-Opens up ssh shell, runs the broker script with “load” which returns job information about “job\_id”
-
-Server.py
-----------
-
-#####-s, --save *ssh|ssl*
-**Note: May not be functional at the moment**
-Runs broker.py with ssh/ssl with save parameter. 
-Server starts application on the port provided by the broker
-In ssh case: the client connects via ssh tunnel to the server and provides a secret which the server then verifies with the broker
-In the ssl case: the server starts up the web application (currently conduit) with the cert path provided by the broker
-
-#####-l, --lorenz
-Runs *SERVER_PATH* from config with an ssl cert provided by proker.
