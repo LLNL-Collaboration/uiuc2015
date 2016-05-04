@@ -18,6 +18,7 @@ Using your favorite text editor open config.ini and replace all of the values fo
 - Set the `USER\_DIR\_BASE` to be where each user directory is found on the broker host, e.g. `/home/`
 
 Your broker and server should have the following, and each script should be accessible to any logged in user.
+
 	- uiuc2015
 		- broker.py
 		- server.py
@@ -26,15 +27,13 @@ Your broker and server should have the following, and each script should be acce
 
 
 Your client computer should have the following.
-`
-	- uiuc2015
+	-uiuc2015
 		- client.py
 		- helpers.py
 		- config.ini
-`
 
 ####[Launching an already supported application]
-You can find the list of supported applications in `APPLICATION_OPTIONS` of the config.ini file.
+You can find the list of supported applications in `APPLICATION_OPTIONS` of the *config.ini* file.
 
 If you would like to run one of the already supported applications, then simply launching `./server.py -a {name_of_app}` will be enough to launch the application. Information about the job will be stored by the broker. If you are using the front end portlet designed for use with Open Lorenz, then your list of currently running jobs will appear in the portlet, and you can connect to them from there. Otherwise running `./client.py --query` will fetch from the broker how to connect to any of your currently running jobs.
 
