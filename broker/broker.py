@@ -12,6 +12,7 @@ import configparser
 from helpers import *
 import importlib.util
 import socket
+import time
 
 #get path of configuration file
 # configuration file is in the script's directory
@@ -30,46 +31,62 @@ FILENAME = os.path.abspath(FILEPATH + "connections.txt")
 
 
 def get_jobs(fo):
-        jobs = fo.read().split("\n")
-        parsed_jobs = []
+    parsed_jobs = []
+    with open(fo, "a+") as job_list:
+        job_list.seek(0,0)
+        jobs = job_list.read().split("\n")
         for job in jobs:
                 if not (is_json(job)):
                         continue
                 parsed_jobs.append(json.loads(job))
-        return parsed_jobs
+    return parsed_jobs
 
 def append_job(FILENAME, job):
-        with open(FILENAME, "a") as job_list:
+    with open(FILENAME, "a") as job_list:
+        job_list.write(json.dumps(job))
+        job_list.write("\n")
+
+def write_jobs(FILENAME, jobs):
+    with open(FILENAME, "w") as job_list:
+        for job in jobs:
             job_list.write(json.dumps(job))
             job_list.write("\n")
 
+def update_job(jobs, key_values):
+    if len(jobs) <= 0:
+        exit("no jobs to update")
+    target_job_id = key_values["job_id"]
+    [x.update(key_values) if x["job_id"] == target_job_id else x for x in jobs]
+    return jobs
+
+
 def save_job(jobs, app, password, ctype, app_module):
-        port = get_fresh_port(jobs)
-        job_id = "job_" + str(port)
-        hostname = socket.gethostname()
-        job = {"job_id": job_id, "port": port, "app" : app, "ctype": ctype, "password_hash" : password, "app_path" : config.get(app, 'SERVER_PATH'), "job_root" : FILEPATH, "host" : hostname, "owner" : USERNAME}
+    port = get_fresh_port(jobs)
+    job_id = "job_" + str(port)
+    hostname = socket.gethostname()
+    job = {"job_id": job_id, "port": port, "app" : app, "protocol": config.get(app, 'PROTOCOL'), "password_hash" : password, "app_path" : config.get(app, 'SERVER_PATH'), "job_root" : FILEPATH, "host" : hostname, "owner" : USERNAME, "creation_timestamp" : int (time.time()), "status": "launched"}
 
-        #generate cert
-        password_hash = password.split(":")[-1]
-        app_module.gen_cert(job, password_hash)
+    #generate cert
+    password_hash = password.split(":")[-1]
+    app_module.gen_cert(job, password_hash)
 
-        # gen config
-        config_path = app_module.gen_config(job)
-        job["config"] = config_path
-        append_job(FILENAME, job)
+    # gen config
+    config_path = app_module.gen_config(job)
+    job["config"] = config_path
+    append_job(FILENAME, job)
 
-        return job
+    return job
 
 
 def get_fresh_port(jobs):
-        if DEBUG:
-                return DEBUG_PORT
-        current_ports = set()
-        for job in jobs:
-                current_ports.add(job["port"])
+    if DEBUG:
+            return DEBUG_PORT
+    current_ports = set()
+    for job in jobs:
+            current_ports.add(job["port"])
+    new_port = random.randint(8000, 10000)
+    while new_port  in current_ports:
         new_port = random.randint(8000, 10000)
-        while new_port  in current_ports:
-            new_port = random.randint(8000, 10000)
 
 
 
@@ -79,6 +96,8 @@ parser.add_option('-q', '--query', action='store_true',
                   dest='query', help='returns job list in json')
 parser.add_option('-v', '--verify', nargs=2, dest='verify',
                   help='verify the secret with a secret matching the job_id in connections.txt')
+parser.add_option('-u', '--update', dest='update',
+                  help='pass in new key value pairs to update job information')
 parser.add_option('-s', '--save', action='store_true', dest='save',
                   help='called when the server needs to register a job')
 parser.add_option('-a', '--app', dest='app',
@@ -88,8 +107,7 @@ parser.add_option('-p', '--password', dest='password',
 options, args = parser.parse_args()
 
 
-with open(FILENAME, "r+") as job_list:
-    jobs = get_jobs(job_list)
+jobs = get_jobs(FILENAME)
 
 if options.load:
     for job in jobs:
@@ -117,6 +135,11 @@ elif options.verify:
     print("Not yet implemented")
     exit()
 
+elif options.update:
+    key_values = json.loads(options.update)
+    jobs = update_job(jobs, key_values)
+    write_jobs(FILENAME, jobs)
+
 elif options.save:
     if options.app:
         app = options.app.lower()
@@ -126,6 +149,9 @@ elif options.save:
         if options.password:
             password = options.password
         else:
+            if config.get(app,'REQUIRE_PASSWORD') == "True":
+                print("A password is required with this application.")
+                exit()
             password = None
         app_module = get_app_module(app)
         ret = save_job(jobs, app, password, "ssl", app_module);

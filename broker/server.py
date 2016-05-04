@@ -68,11 +68,19 @@ def run_app(app):
     run(cmd)
     proc = Popen(cmd)
     child_pid = proc.pid
+
+    # give broker the job's pid
+    key_values = {"job_id": job["job_id"], "pid" : child_pid}
+    key_values = json.dumps(key_values)
+    cmd = BROKER_PATH + " -u '{}'".format(key_values)
+    ret = run(cmd, BROKER_IP)
     (output, error) = proc.communicate()
 
     if error:
         print("error:", error)
     print("output:", output)
+
+
 
 
 
