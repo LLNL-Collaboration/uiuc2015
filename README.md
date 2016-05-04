@@ -15,7 +15,7 @@ Using your favorite text editor open config.ini and replace all of the values fo
 - Set `BROKER_PATH` to be path to the *broker.py* file on the broker host.
 - Set `DEBUG` to true and `DEBUG_PORT` to any port number to force the broker to only use one port.
 - Set `APPLICATION_OPTIONS` to be a list of the names of your currently supported applications.
-- Set the `USER\_DIR\_BASE` to be where each user directory is found on the broker host, e.g. `/home/`
+- Set the `USER_DIR_BASE` to be where each user directory is found on the broker host, e.g. `/home/`
 
 Your broker and server should have the following, and each script should be accessible to any logged in user.
 
