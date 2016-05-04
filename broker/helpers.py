@@ -12,25 +12,23 @@ import hashlib
 import getpass
 
 config = configparser.SafeConfigParser()
-dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
-config_file_path = os.path.join(dir, 'config.ini')
+current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
+config_file_path = os.path.join(current_dir, 'config.ini')
 config.read(config_file_path)
-LOCAL = config.getboolean('general', 'LOCAL')
 
 
-
-def run(command, host = None):
-    if LOCAL or (host is None):
-        output = subprocess.getoutput(command)
+def run(cmd, local_host = None, remote_host = None, local = False):
+    if local or (remote_host == local_host):
+        output = subprocess.getoutput(cmd)
         return [output.strip()]
     try:
         s = pxssh.pxssh()
-        hostname = host
+        hostname = remote_host
         username = getpass.getuser()
         s.login(hostname, username)
-        s.sendline(command)
+        s.sendline(cmd)
         s.prompt()
-        output = s.before.split("\r\n")[1:-1]
+        output = s.before.decode('utf-8').split("\r\n")[1:-1]
         s.logout()
         return output
     except pxssh.ExceptionPxssh as e:
