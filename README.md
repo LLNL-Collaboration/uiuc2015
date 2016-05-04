@@ -4,7 +4,7 @@
 This application helps facilitate easily and securely launching applications and keeping track of currently running applications. There are three main components to this project: *server.py*, *broker.py*, and *client.py*. Information about each running application is stored in the JSON job object. The server launches the application. The broker stores information about each of the running jobs. The client requests how to access each job from the broker.
 
 ####[Requirements]
-All of the scripts require python 3.
+All of the scripts require **python 3**.
 
 ####[Setting up]
 Clone the repo:
@@ -27,6 +27,7 @@ Your broker and server should have the following, and each script should be acce
 
 
 Your client computer should have the following.
+
 	-uiuc2015
 		- client.py
 		- helpers.py

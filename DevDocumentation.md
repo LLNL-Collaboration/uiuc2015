@@ -2,6 +2,7 @@
 
 ####[Job Object Schema]
 Example job object:
+
 	{"job_root": "/project/shared/home/test/", 
 	"app": "conduit", 
 	"job_id": "job_8000", ***unique key***
@@ -21,6 +22,7 @@ Example job object:
 The server script is responsible for launching the application. The user must run this script on the machine that the application will run from. The server will request that the broker return the relevant information needed to start the job e.g. which port to run on, where the config file is, etc.
 
 Usage:
+
 	-a {string: app_name} : determines which application to launch
 
 ####[broker.py]
@@ -32,12 +34,14 @@ End users should not be interacting with the broker directly. Instead they shoul
 
 Usage:
 -	Called by server script:
+
 		-r : boolean flag, determines whether to register a new application
 		-a {string: app_name} : determines which application to use  
 		-p {string: password} : password hash to use for SSL certificate generation and protecting the application (if supported)
 		-u {json: key_values} : update a job with these new key values. job_id must be including in one of the key_values
 
 -	Called by client script:
+
 		-q : boolean flag, runs the query command
 
 
@@ -45,11 +49,13 @@ Usage:
 The client script is able to query the broker to find out what the currently running applications are and how to access them. 
 
 Usage:
+
 `	-q : boolean flag, prints the output of querying the broker`
 
 
 
 ####[{USER\_DIR\_BASE}/{username}/]
+
 	[connections.txt]
 		Contains a list of every single job that is registered to that username. 
 		The broker appends to this file to register new jobs and reads from it to answer client queries.
