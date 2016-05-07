@@ -10,11 +10,29 @@ import subprocess
 import importlib.util
 import hashlib
 import getpass
+import optparse
+import time
+import socket
+
+
+#get path of configuration file
+# configuration file is in the script's directory
 
 config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(current_dir, 'config.ini')
 config.read(config_file_path)
+SERVER_IP = config.get('general','SERVER_IP')
+
+BROKER_PATH = config.get('general', 'BROKER_PATH')
+BROKER_IP = config.get('general','BROKER_IP')
+USER_DIR_BASE = config.get('general','USER_DIR_BASE')
+DEBUG = config.getboolean('general','DEBUG')
+DEBUG_PORT = config.get('general','DEBUG_PORT')
+APPLICATION_OPTIONS = config.get('general', 'APPLICATION_OPTIONS')
+USERNAME = getpass.getuser()
+FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME) + "/"
+FILENAME = os.path.abspath(FILEPATH + "connections.txt")
 
 
 def run(cmd, local_host = None, remote_host = None, local = False):
