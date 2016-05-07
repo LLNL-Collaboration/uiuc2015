@@ -16,6 +16,7 @@ config.read(config_file_path)
 BROKER_PATH = config.get('general', 'BROKER_PATH')
 BROKER_IP = config.get('general', 'BROKER_IP')
 
+
 def query(local):
 	command = BROKER_PATH + ' --query'
 	ret = run(cmd =command, remote_host = BROKER_IP, local = local)[0]

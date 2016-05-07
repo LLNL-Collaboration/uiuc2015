@@ -10,12 +10,20 @@ import subprocess
 import importlib.util
 import hashlib
 import getpass
+import optparse
+import time
+import socket
+
+
+#get path of configuration file
+# configuration file is in the script's directory
 
 config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(current_dir, 'config.ini')
 config.read(config_file_path)
 LOCAL = config.getboolean('general','LOCAL')
+
 
 
 def config_item_to_list(item):
