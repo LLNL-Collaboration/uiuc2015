@@ -6,7 +6,7 @@ import json
 import subprocess
 import configparser
 import optparse
-from helpers import run, is_json
+from utils import run, is_json
 
 config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]

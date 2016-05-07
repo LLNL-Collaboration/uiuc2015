@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
+import utils
 import os
 import json
 import getpass
 import optparse
 import configparser
-from helpers import *
+import utils
 import importlib.util
 import time
+import socket
 
 #get path of configuration file
 # configuration file is in the script's directory
@@ -20,6 +22,7 @@ USER_DIR_BASE = config.get('general','USER_DIR_BASE')
 DEBUG = config.getboolean('general','DEBUG')
 DEBUG_PORT = config.get('general','DEBUG_PORT')
 APPLICATION_OPTIONS = config.get('general', 'APPLICATION_OPTIONS')
+APPLICATION_OPTIONS = utils.config_item_to_list(APPLICATION_OPTIONS)
 USERNAME = getpass.getuser()
 FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME) + "/"
 FILENAME = os.path.abspath(FILEPATH + "connections.txt")
@@ -31,7 +34,7 @@ def get_jobs(fo):
         job_list.seek(0,0)
         jobs = job_list.read().split("\n")
         for job in jobs:
-                if not (is_json(job)):
+                if not (utils.is_json(job)):
                         continue
                 parsed_jobs.append(json.loads(job))
     return parsed_jobs
@@ -142,7 +145,7 @@ if __name__ == "__main__":
                     print("A password is required with this application.")
                     exit()
                 password = None
-            app_module = get_app_module(app)
+            app_module = utils.get_app_module(app)
             ret = register_job(jobs, app, password, "ssl", app_module);
             print(json.dumps(ret))
         else:

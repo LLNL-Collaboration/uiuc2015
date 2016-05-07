@@ -1,5 +1,5 @@
 from notebook.auth import passwd
-from helpers import gen_cert
+from utils import gen_cert
 
 def get_password():
 	return passwd(None, 'sha512')

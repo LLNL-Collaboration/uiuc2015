@@ -1,6 +1,6 @@
-from helpers import gen_cert
-from helpers import get_apache_password_digest
-from helpers import gen_apache_htpasswd
+from utils import gen_cert
+from utils import get_apache_password_digest
+from utils import gen_apache_htpasswd
 import getpass
 
 def get_password():

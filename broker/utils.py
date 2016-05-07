@@ -15,7 +15,13 @@ config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(current_dir, 'config.ini')
 config.read(config_file_path)
+LOCAL = config.getboolean('general','LOCAL')
 
+
+def config_item_to_list(item):
+    items = item.splitlines()
+    non_blank_items = list(filter((lambda x : len(x.strip()) > 0), items))
+    return non_blank_items
 
 def run(cmd, local_host = None, remote_host = None, local = False):
     if local or (remote_host == local_host):
@@ -78,12 +84,17 @@ def gen_cert(job, password_hash):
 def get_app_module(app):
     try:
         app_module_path = config.get(app,'APP_MODULE_PATH')
-        app_module = config.get(app,'APP_MODULE')
-        spec = importlib.util.spec_from_file_location(app_module, app_module_path)
-        app_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(app_module)
-        return app_module
-    except configparser.NoOptionError as e:
-        print("No app module found!")
+        app_module  = importlib.import_module(app_module_path)
+    except ImportError as e:
+        print("Error loading app module for {}".format(app))
+        print(e)
         exit()
-
+    required_functions = config.get('general', 'REQUIRED_APP_FUNCTIONS')
+    required_functions = config_item_to_list(required_functions)
+    for func_str in required_functions:
+        func = getattr(app_module, func_str, None)
+        is_func = hasattr(func, '__call__')
+        if (not is_func):
+            print("Error: required function: {func_str} is not implemented by {app_module_path}".format(func_str = func_str, app_module_path = app_module_path))
+            exit()
+    return app_module

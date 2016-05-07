@@ -10,7 +10,7 @@ import crypt
 import hashlib
 import importlib.util
 from subprocess import Popen
-from helpers import *
+import utils
 
 config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
@@ -33,7 +33,7 @@ def prep_run_command(app_module, job):
     return cmd_str.split(" ")
 
 def run_app(app):
-    app_module = get_app_module(app)
+    app_module = utils.get_app_module(app)
     require_password = config.get(app,'REQUIRE_PASSWORD') == "True"
     if(require_password):
         password_hash = get_password_hash(app_module)
@@ -43,7 +43,7 @@ def run_app(app):
 
     # register job with broker
     cmd = BROKER_PATH + " -r -a " + app + pass_param
-    data = run(cmd = cmd, local_host = SERVER_IP, remote_host = BROKER_IP)
+    data = utils.run(cmd = cmd, local_host = SERVER_IP, remote_host = BROKER_IP)
     job = json.loads(data[0])
 
     # run the new job
