@@ -20,6 +20,7 @@ SERVER_IP = config.get('general','SERVER_IP')
 BROKER_IP = config.get('general','BROKER_IP')
 BROKER_PATH = config.get('general','BROKER_PATH')
 APPLICATION_OPTIONS = config.get('general', 'APPLICATION_OPTIONS')
+APPLICATION_OPTIONS = utils.config_item_to_list(APPLICATION_OPTIONS)
 USER_DIR_BASE = config.get('general','USER_DIR_BASE')
 USERNAME = getpass.getuser()
 FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME)
@@ -72,8 +73,7 @@ if __name__ == "__main__":
     if options.app:
         app = options.app.lower()
         if app not in APPLICATION_OPTIONS:
-            parser.print_help()
-            exit()
+            parser.error("app must be in one of {}".format(str(APPLICATION_OPTIONS)))
         run_app(app);
 
     else:

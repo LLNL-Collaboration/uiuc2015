@@ -113,6 +113,7 @@ if __name__ == "__main__":
         print(json.dumps(jobs))
 
     elif options.verify:
+        raise NotImplementedError()
         job_id = options.verify[0]
         secret = options.verify[1]
         valid = False
@@ -123,9 +124,9 @@ if __name__ == "__main__":
                 # verify using app specific hash #
                 if job['secret'] == secret:
                     print("Not yet implemented")
-                    exit()
+                    exit(1)
         print("Not yet implemented")
-        exit()
+        exit(1)
 
     elif options.update:
         key_values = json.loads(options.update)
@@ -136,21 +137,20 @@ if __name__ == "__main__":
         if options.app:
             app = options.app.lower()
             if app not in APPLICATION_OPTIONS:
-                parser.print_help()
-                exit()
+                parser.error("app must be in one of {}".format(str(APPLICATION_OPTIONS)))
             if options.password:
                 password = options.password
             else:
                 if config.get(app,'REQUIRE_PASSWORD') == "True":
-                    print("A password is required with this application.")
-                    exit()
+                    parser.error("A password is required with this application.")
                 password = None
             app_module = utils.get_app_module(app)
             ret = register_job(jobs, app, password, "ssl", app_module);
             print(json.dumps(ret))
         else:
             parser.print_help()
-            exit()
+            exit(1)
     else:
         parser.print_help()
+        exit(1)
 
