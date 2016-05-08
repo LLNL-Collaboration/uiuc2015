@@ -11,7 +11,7 @@ from time import sleep
 
 config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
-config_file_path = os.path.join(current_dir, 'config.ini')
+config_file_path = os.path.join(current_dir, 'client_config.ini')
 config.read(config_file_path)
 
 AUTH_URL = config.get('client','AUTH_URL')
