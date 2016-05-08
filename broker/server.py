@@ -55,7 +55,7 @@ def run_app(app):
     key_values = {"job_id": job["job_id"], "pid" : child_pid}
     key_values = json.dumps(key_values)
     cmd = BROKER_PATH + " -u '{}'".format(key_values)
-    run(cmd = cmd, local_host = SERVER_IP, remote_host = BROKER_IP)
+    utils.run(cmd = cmd, local_host = SERVER_IP, remote_host = BROKER_IP)
     (output, error) = proc.communicate()
 
     if error:
