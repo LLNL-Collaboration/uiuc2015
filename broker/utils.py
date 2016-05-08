@@ -22,7 +22,7 @@ config = configparser.SafeConfigParser()
 current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
 config_file_path = os.path.join(current_dir, 'config.ini')
 config.read(config_file_path)
-LOCAL = config.getboolean('general','LOCAL')
+FORCE_LOCAL = config.getboolean('general','FORCE_LOCAL')
 
 
 
@@ -32,7 +32,7 @@ def config_item_to_list(item):
     return non_blank_items
 
 def run(cmd, local_host = None, remote_host = None, local = False):
-    if local or (remote_host == local_host):
+    if FORCE_LOCAL or local or (remote_host == local_host):
         output = subprocess.getoutput(cmd)
         return [output.strip()]
     try:
