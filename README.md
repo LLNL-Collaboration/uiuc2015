@@ -4,7 +4,9 @@
 This application helps facilitate easily and securely launching applications and keeping track of currently running applications. There are three main components to this project: *server.py*, *broker.py*, and *client.py*. Information about each running application is stored in the JSON job object. The server launches the application. The broker stores information about each of the running jobs. The client requests how to access each job from the broker.
 
 ####[Requirements]
-All of the scripts require **python 3**.
+All of the scripts require **python 3**.  
+Module requirements - pexpect  
+Client additional requirements - paramiko, requests  
 
 ####[Setting up]
 Clone the repo:
@@ -20,18 +22,25 @@ Using your favorite text editor open config.ini and replace all of the values fo
 Your broker and server should have the following, and each script should be accessible to any logged in user.
 
 	- uiuc2015
+		= __init__.py
 		- broker.py
 		- server.py
-		- helpers.py
+		- utils.py
 		- config.ini
-
+		- app_modules/
 
 Your client computer should have the following.
 
 	- uiuc2015
+		- __init__.py
 		- client.py
-		- helpers.py
+		- utils.py
 		- config.ini
+		- client_utils/
+			automated_tunnerling.py
+			client_config.ini
+			forward.py
+			__init__.py
 
 ####[Launching an already supported application]
 You can find the list of supported applications in `APPLICATION_OPTIONS` of the *config.ini* file.
