@@ -25,7 +25,7 @@ APPLICATION_OPTIONS = config.get('general', 'APPLICATION_OPTIONS')
 APPLICATION_OPTIONS = utils.config_item_to_list(APPLICATION_OPTIONS)
 USERNAME = getpass.getuser()
 FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME) + "/"
-FILENAME = os.path.abspath(FILEPATH + "connections.txt"
+FILENAME = os.path.abspath(FILEPATH + "connections.txt")
 
 
 def get_jobs(fo):

@@ -12,6 +12,18 @@ import importlib.util
 from subprocess import Popen
 import utils
 
+config = configparser.SafeConfigParser()
+current_dir = os.path.realpath(__file__).rsplit(os.sep,1)[0]
+config_file_path = os.path.join(current_dir, 'config.ini')
+config.read(config_file_path)
+SERVER_IP = config.get('general','SERVER_IP')
+BROKER_IP = config.get('general','BROKER_IP')
+BROKER_PATH = config.get('general','BROKER_PATH')
+APPLICATION_OPTIONS = config.get('general', 'APPLICATION_OPTIONS')
+USER_DIR_BASE = config.get('general','USER_DIR_BASE')
+USERNAME = getpass.getuser()
+FILEPATH = os.path.abspath(USER_DIR_BASE + USERNAME)
+
 
 def get_password_hash(app_module):
     return app_module.get_password()
@@ -36,7 +48,7 @@ def run_app(app):
 
     # run the new job
     cmd = prep_run_command(app_module, job)
-    proc = subprocess.Popen(cmd)
+    proc = Popen(cmd)
     child_pid = proc.pid
 
     # give broker the job's pid
